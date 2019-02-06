@@ -7,6 +7,7 @@ use App\Customs\Paginate\Paginate;
 use App\Http\Requests\Api\CreateDistributor;
 use App\Http\Requests\Api\UpdateDistributor;
 use App\Customs\Transformers\DistributorTransformer;
+use Illuminate\Support\Facades\Cache;
 
 class DistributorController extends ApiController
 {
@@ -18,8 +19,6 @@ class DistributorController extends ApiController
     public function __construct(DistributorTransformer $transformer)
     {
         $this->transformer = $transformer;
-
-        $this->middleware('auth.api');
     }
 
     /**
@@ -67,6 +66,32 @@ class DistributorController extends ApiController
         } else {
             return $this->respondError('The distributor does not exist', 400);
         }
+    }
+
+    /**
+     * Display the specified resource.
+     * 
+     * store result 10min in cache
+     *
+     * @param  date  $date
+     * @return \Illuminate\Http\Response
+     */
+    public function report($date)
+    {
+        $tasks = Cache::remember("tasks_{$date}", 5, function () use ($date) {
+            $collection = Distributor::with(['tasks' => function ($query) use ($date) {
+                $query->where('fecha', $date);
+            }])->get();
+
+            return collect($collection)->map(function ($row) {
+                return [
+                    'distributor' => $row->login,
+                    'totalTasks' => count($row->tasks)
+                ];
+            });
+        });
+
+        return $this->respond($tasks);
     }
 
     /**

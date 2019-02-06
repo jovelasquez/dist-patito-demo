@@ -6,9 +6,8 @@ use App\Task;
 use App\Distributor;
 use App\Customs\Paginate\Paginate;
 use App\Http\Requests\Api\CreateTask;
-use App\Customs\Transformers\TaskTransformer;
-use Illuminate\Support\Facades\Cache;
 use App\Http\Requests\Api\UpdateTask;
+use App\Customs\Transformers\TaskTransformer;
 
 class TaskController extends ApiController
 {
@@ -20,8 +19,6 @@ class TaskController extends ApiController
     public function __construct(TaskTransformer $transformer)
     {
         $this->transformer = $transformer;
-
-        $this->middleware('auth.api');
     }
 
     /**
@@ -55,43 +52,6 @@ class TaskController extends ApiController
         ]);
 
         return $this->respondWithTransformer($task);
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     * 
-     * store result 10min in cache
-     *
-     * @param  date  $date
-     * @return \Illuminate\Http\Response
-     */
-    public function report($date)
-    {
-        $tasks = Cache::remember("tasks_{$date}", 5, function () use ($date) {
-            $collection = Distributor::with(['tasks' => function ($query) use ($date) {
-                $query->where('fecha', $date);
-            }])->get();
-
-            return collect($collection)->map(function ($row) {
-                return [
-                    'distributor' => $row->login,
-                    'totalTasks' => count($row->tasks)
-                ];
-            });
-        });
-
-        return $this->respond($tasks);
     }
 
     /**
