@@ -7,10 +7,10 @@
 
 <body>
 
-  <p>Hola, </p>
+  <p>Hola, <strong>{{ $distributor->login }}</strong></p>
   <p>Hemos generado un nueva contraseña para ti.</p>
 
-  <strong></strong>
+  <strong>{{ $distributor->password }}</strong>
 
 </body>
 
