@@ -39,7 +39,7 @@ class SendEmailJob implements ShouldQueue
      */
     public function handle()
     {
-        $email = new SendEmailPassword();
+        $email = new SendEmailPassword($this->distributor);
         Mail::to($this->distributor['email'])->send($email);
     }
 }

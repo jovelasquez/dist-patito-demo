@@ -11,14 +11,17 @@ class SendEmailPassword extends Mailable
 {
     use Queueable, SerializesModels;
 
+    public $distributor;
+
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($distributor)
     {
         //
+        $this->distributor = $distributor;
     }
 
     /**
@@ -28,6 +31,9 @@ class SendEmailPassword extends Mailable
      */
     public function build()
     {
-        return $this->view('emails.new-passwd');
+        return $this->view('emails.new-passwd')->with([
+            'name' => $this->distributor['login'],
+            'password' => $this->distributor['password']
+        ]);;
     }
 }
