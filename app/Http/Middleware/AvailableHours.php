@@ -30,11 +30,11 @@ class AvailableHours
      */
     public function handle($request, Closure $next)
     {
-        // if (strtotime(date('H:i:s')) >= strtotime($this->_start)
-        //     && strtotime(date('H:i:s')) >= strtotime($this->_end)) {
+        if (strtotime(date('H:i:s')) >= strtotime($this->_start)
+            && strtotime(date('H:i:s')) >= strtotime($this->_end)) {
 
-        //     return $this->respondError('Forbidden: the service isn\'t available at this time');
-        // }
+            return $this->respondError('Forbidden: the service isn\'t available at this time');
+        }
 
         return $next($request);
     }
@@ -52,6 +52,6 @@ class AvailableHours
                 'message' => $message,
                 'status_code' => 403
             ]
-        ], 401);
+        ], 403);
     }
 }
